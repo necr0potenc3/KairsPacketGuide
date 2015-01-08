@@ -1,0 +1,205 @@
+<html>
+	<head>
+		<title>Ultima Online Protocol :: PacketStream (VB.NET)</title>
+	</head>
+	<body bgcolor="#FFFFE1" link="#89A5F5" alink="#89A5F5" vlink="#89A5F5">
+		<center><strong>Ultima Online Protocol :: PacketStream (VB.NET)</strong></center>
+		<pre>
+      <font color="blue">Imports</font> System
+
+      <font color="blue">Public Class</font> PacketStream
+          <font color="blue">Private</font> m_ByteStream() <font color="blue">As Byte</font>
+          <font color="blue">Private</font> position <font color="blue">As Short</font> = 0
+
+          <font color="blue">Public Sub</font> New()
+              m_ByteStream = <font color="blue">Nothing</font>
+          <font color="blue">End Sub</font>
+          <font color="blue">Public Sub</font> <font color="blue">New</font>(<font color="blue">ByVal</font> stream() <font color="blue">As Byte</font>)
+              m_ByteStream = stream
+          <font color="blue">End Sub</font>
+
+          <font color="blue">Public Property</font> Size() <font color="blue">As Integer</font>
+              <font color="blue">Get</font>
+                  <font color="blue">If</font> m_ByteStream <font color="blue">Is Nothing Then Return</font> 0
+                  <font color="blue">Return</font> m_ByteStream.Length
+              <font color="blue">End Get</font>
+              <font color="blue">Set</font>(<font color="blue">ByVal</font> Value <font color="blue">As Integer</font>)
+                  <font color="blue">ReDim Preserve</font> m_ByteStream(Value)
+              <font color="blue">End Set</font>
+          <font color="blue">End Property</font>
+
+          <font color="blue">Public Sub</font> Seek(<font color="blue">ByVal</font> pos <font color="blue">As Short</font>)
+              position = pos
+          <font color="blue">End Sub</font>
+
+          <font color="blue">Public Sub</font> writeByte(<font color="blue">ByVal</font> input <font color="blue">As Byte</font>)
+              <font color="blue">If</font> position > Size - 1 <font color="blue">Then</font> Size += 1
+
+              m_ByteStream(position) = input
+              position += 1
+          <font color="blue">End Sub</font>
+          <font color="blue">Public Sub</font> writeBoolean(<font color="blue">ByVal</font> input <font color="blue">As Boolean</font>)
+              writeByte(IIf(input, 1, 0))
+          <font color="blue">End Sub</font>
+          <font color="blue">Public Sub</font> writeInt16(<font color="blue">ByVal</font> input <font color="blue">As Short</font>)
+              writeByte(BitConverter.GetBytes(input)(1))
+              writeByte(BitConverter.GetBytes(input)(0))
+          <font color="blue">End Sub</font>
+          <font color="blue">Public Sub</font> writeUInt16(<font color="blue">ByVal</font> input <font color="blue">As</font> UInt16)
+              writeByte(BitConverter.GetBytes(input)(1))
+              writeByte(BitConverter.GetBytes(input)(0))
+          <font color="blue">End Sub</font>
+          <font color="blue">Public Sub</font> writeInt32(<font color="blue">ByVal</font> input <font color="blue">As Integer</font>)
+              writeByte(BitConverter.GetBytes(input)(3))
+              writeByte(BitConverter.GetBytes(input)(2))
+              writeByte(BitConverter.GetBytes(input)(1))
+              writeByte(BitConverter.GetBytes(input)(0))
+          <font color="blue">End Sub</font>
+          <font color="blue">Public Sub</font> writeUInt32(<font color="blue">ByVal</font> input <font color="blue">As</font> UInt32)
+              writeByte(BitConverter.GetBytes(input)(3))
+              writeByte(BitConverter.GetBytes(input)(2))
+              writeByte(BitConverter.GetBytes(input)(1))
+              writeByte(BitConverter.GetBytes(input)(0))
+          <font color="blue">End Sub</font>
+          <font color="blue">Public Sub</font> writeString(<font color="blue">ByVal</font> input <font color="blue">As String</font>)
+              <font color="blue">Dim</font> array() <font color="blue">As Char</font> = input.ToCharArray()
+              <font color="blue">Dim</font> i <font color="blue">As Integer</font>
+
+              writeInt16(input.Length)
+              <font color="blue">For</font> i = 0 <font color="blue">To</font> input.Length - 1
+                  writeChar(array(i))
+              <font color="blue">Next</font>
+          <font color="blue">End Sub</font>
+          <font color="blue">Public Sub</font> writeChar(<font color="blue">ByVal</font> input <font color="blue">As Char</font>)
+              writeByte(Convert.ToByte(input))
+          <font color="blue">End Sub</font>
+          <font color="blue">Public Sub</font> writeChars(<font color="blue">ByVal</font> input() <font color="blue">As Char</font>, <font color="blue">ByVal</font> length <font color="blue">As Integer</font>)
+              <font color="blue">Dim</font> i <font color="blue">As Integer</font>
+
+              <font color="blue">For</font> i = 0 <font color="blue">To</font> length - 1
+                  <font color="blue">If</font> i >= input.Length <font color="blue">Then</font>
+                      writeByte(0)
+                  <font color="blue">Else</font>
+                      writeChar(input(i))
+                  <font color="blue">End If</font>
+              <font color="blue">Next</font>
+          <font color="blue">End Sub</font>
+          <font color="blue">Public</font> <font color="blue">Sub</font> writeChars(<font color="blue">ByVal</font> input() <font color="blue">As</font> Char)
+              writeChars(input, input.Length)
+          <font color="blue">End Sub</font>
+
+          <font color="blue">Public ReadOnly Property</font> GetBytes() <font color="blue">As Byte</font>()
+              <font color="blue">Get</font>
+                  <font color="blue">Return</font> m_ByteStream
+              <font color="blue">End Get</font>
+          <font color="blue">End Property</font>
+
+          <font color="blue">Public Function</font> readByte() <font color="blue">As Byte</font>
+              <font color="blue">If</font> position > Size - 1 <font color="blue">Then Return</font> 0
+
+              position += 1
+              <font color="blue">Return</font> m_ByteStream(position - 1)
+          <font color="blue">End Function</font>
+          <font color="blue">Public Function</font> readInt16() <font color="blue">As Short</font>
+              <font color="blue">Dim</font> retVal <font color="blue">As Short</font>
+
+              retVal = readByte() * 2 ^ 8
+              retVal += readByte()
+
+              <font color="blue">Return</font> retVal
+          <font color="blue">End Function</font>
+          <font color="blue">Public Function</font> readUInt16() <font color="blue">As</font> UInt16
+              <font color="blue">Dim</font> retVal <font color="blue">As</font> UInt16
+
+              retVal = Convert.ToUInt16(readByte() * 2 ^ 8 + readByte())
+
+              <font color="blue">Return</font> retVal
+          <font color="blue">End Function</font>
+          <font color="blue">Public Function</font> readInt32() <font color="blue">As Integer</font>
+              <font color="blue">Dim</font> retVal <font color="blue">As Integer</font>
+
+              retVal = readByte() * 2 ^ 24
+              retVal += readByte() * 2 ^ 16
+              retVal += readByte() * 2 ^ 8
+              retVal += readByte()
+
+              <font color="blue">Return</font> retVal
+          <font color="blue">End Function</font>
+          <font color="blue">Public Function</font> readUInt32() <font color="blue">As</font> UInt32
+              <font color="blue">Dim</font> retVal <font color="blue">As</font> UInt32
+
+              retVal = Convert.ToUInt32(readByte() * 2 ^ 24 + readByte() * 2 ^ 16 + readByte() * 2 ^ 8 + readByte())
+              
+              <font color="blue">Return</font> retVal
+          <font color="blue">End Function</font>
+          <font color="blue">Public Function</font> readBoolean() <font color="blue">As Boolean</font>
+              <font color="blue">Return</font> IIf(readByte() = 1, <font color="blue">True</font>, <font color="blue">False</font>)
+          <font color="blue">End Function</font>
+          <font color="blue">Public Function</font> readChar() <font color="blue">As Char</font>
+              <font color="blue">Return</font> Convert.ToChar(readByte())
+          <font color="blue">End Function</font>
+          <font color="blue">Public Function</font> readChars(<font color="blue">ByVal</font> length <font color="blue">As Integer</font>) <font color="blue">As Char</font>()
+              <font color="blue">Return</font> readChars(length, <font color="blue">False</font>)
+          <font color="blue">End Function</font>
+          <font color="blue">Public Function</font> readChars(<font color="blue">ByVal</font> length <font color="blue">As Integer</font>, <font color="blue">ByVal</font> keepnullchars <font color="blue">As Boolean</font>) <font color="blue">As Char</font>()
+              <font color="blue">Dim</font> retVal(length - 1) <font color="blue">As Char</font>
+              <font color="blue">Dim</font> i <font color="blue">As Integer</font>
+
+              <font color="blue">For</font> i = 0 <font color="blue">To</font> length - 1
+                  retVal(i) = readChar()
+              <font color="blue">Next</font>
+
+              <font color="blue">If Not</font> keepnullchars <font color="blue">Then</font>
+                  <font color="blue">Dim</font> newVal <font color="blue">As String</font> = ""
+
+                  <font color="blue">For</font> i = 0 <font color="blue">To</font> length - 1
+                      <font color="blue">If Not</font> (retVal(i) = Convert.ToChar(0)) <font color="blue">Then</font>
+                          newVal += retVal(i)
+                      <font color="blue">End If</font>
+                  <font color="blue">Next</font>
+                  retVal = newVal.ToCharArray()
+              <font color="blue">End If</font>
+
+              <font color="blue">Return</font> retVal
+          <font color="blue">End Function</font>
+          <font color="blue">Public Function</font> readString() <font color="blue">As String</font>
+              <font color="blue">Dim</font> retVal <font color="blue">As String</font> = ""
+              <font color="blue">Dim</font> length <font color="blue">As Integer</font> = readInt16()
+              <font color="blue">Dim</font> i <font color="blue">As Integer</font>
+
+              <font color="blue">For</font> i = 0 <font color="blue">To</font> length - 1
+                  <font color="blue">Dim</font> nextChar <font color="blue">As Char</font> = readChar()
+                  <font color="blue">If Not</font> (nextChar = Convert.ToChar(0)) <font color="blue">Then</font>
+                      retVal += nextChar
+                  <font color="blue">End If</font>
+              <font color="blue">Next</font>
+
+              <font color="blue">Return</font> retVal
+          <font color="blue">End Function</font>
+          <font color="blue">Public Function</font> readString(<font color="blue">ByVal</font> length <font color="blue">As Integer</font>) <font color="blue">As String</font>
+              Dim retVal <font color="blue">As String</font> = ""
+              Dim i <font color="blue">As Integer</font>
+
+              <font color="blue">For</font> i = 0 <font color="blue">To</font> length - 1
+                  <font color="blue">Dim</font> nextChar <font color="blue">As Char</font> = readChar()
+                  <font color="blue">If Not</font> (nextChar = Convert.ToChar(0)) <font color="blue">Then</font>
+                      retVal += nextChar
+                  <font color="blue">End If</font>
+              <font color="blue">Next</font>
+
+              <font color="blue">Return</font> retVal
+          <font color="blue">End Function</font>
+          <font color="blue">Public Function</font> readBytes(<font color="blue">ByVal</font> length <font color="blue">As Short</font>) <font color="blue">As Byte</font>()
+              <font color="blue">Dim</font> retVal(length - 1) <font color="blue">As Byte</font>
+              <font color="blue">Dim</font> i <font color="blue">As Integer</font>
+
+              <font color="blue">For</font> i = 0 <font color="blue">To</font> length - 1
+                  retVal(i) = readByte()
+              <font color="blue">Next</font>
+
+              <font color="blue">Return</font> retVal
+          <font color="blue">End Function</font>
+      <font color="blue">End Class</font>
+    </pre>
+	</body>
+</html>

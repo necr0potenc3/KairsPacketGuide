@@ -1,0 +1,14 @@
+<html xmlns:code>
+<head>
+<style>
+@media all
+{
+  code\:keyword
+  {
+    color : #0000FF;
+    cursor : help;
+  }
+}
+</style>
+</head>
+</html>

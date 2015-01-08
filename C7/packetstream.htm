@@ -1,0 +1,212 @@
+<html>
+  <head>
+    <title>Ultima Online Protocol :: PacketStream (C++ .NET)</title>
+  </head>
+  <body bgcolor="#FFFFE1" link="#89A5F5" alink="#89A5F5" vlink="#89A5F5">
+    <center><strong>Ultima Online Protocol :: PacketStream (C++ .NET)</strong></center>
+	<pre>
+      <font color="blue">using</font> System;
+
+      <font color="blue">namespace</font> UOProtocol
+      {
+          <font color="blue">public class</font> PacketStream
+          {
+              <font color="blue">private byte</font>[] m_ByteStream;
+              <font color="blue">private short</font> position = 0;
+
+              <font color="blue">public</font> PacketStream() { m_ByteStream = <font color="blue">null</font>; }
+              <font color="blue">public</font> PacketStream(<font color="blue">byte</font>[] stream)
+              {
+                  m_ByteStream = stream;
+              }
+
+              <font color="blue">public int</font> Size
+              {
+                  <font color="blue">get</font>
+                  {
+                      <font color="blue">if</font>( m_ByteStream == <font color="blue">null</font> ) <font color="blue">return</font> 0;
+                      <font color="blue">return</font> m_ByteStream.Length;
+                  }
+                  <font color="blue">set</font>
+                  {
+                      <font color="blue">byte</font>[] m_New = <font color="blue">new byte</font>[value];
+                      <font color="blue">if</font>( m_ByteStream != <font color="blue">null</font> )
+                      {
+                          <font color="blue">for</font>(<font color="blue">int</font> i = 0; i < m_ByteStream.Length; i++)
+                          {
+                              <font color="blue">if</font>( i < m_New.Length - 1 )
+                              m_New[i] = m_ByteStream[i];
+                          }
+                      }
+
+                      m_ByteStream = m_New;
+                  }
+              }
+
+              <font color="blue">public void</font> Seek(<font color="blue">short</font> pos)
+              {
+                  position = pos;
+              }
+
+              <font color="blue">public void</font> writeByte(<font color="blue">byte</font> input)
+              {
+                  <font color="blue">if</font>( position > Size - 1 ) Size++;
+
+                  m_ByteStream[position] = input;
+                  position += 1;
+              }
+              <font color="blue">public void</font> writeBoolean(<font color="blue">bool</font> input)
+              {
+                  writeByte( (<font color="blue">byte</font>)(input == true ? 1 : 0) );
+              }
+              <font color="blue">public void</font> writeInt16(<font color="blue">short</font> input)
+              {
+                  writeByte( (<font color="blue">byte</font>)(input >> 8) );
+                  writeByte( (<font color="blue">byte</font>)(input % 256) );
+              }
+              <font color="blue">public void</font> writeUInt16(<font color="blue">ushort</font> input)
+              {
+                  writeByte( (<font color="blue">byte</font>)(input >> 8) );
+                  writeByte( (<font color="blue">byte</font>)(input % 256) );
+              }
+              <font color="blue">public void</font> writeUInt32(<font color="blue">uint</font> input)
+              {
+                  writeByte( (<font color="blue">byte</font>)(input >> 24) );
+                  writeByte( (<font color="blue">byte</font>)((input >> 16) % 256) );
+                  writeByte( (<font color="blue">byte</font>)((input >> 8) % 256) );
+                  writeByte( (<font color="blue">byte</font>)(input % 256) );
+              }
+              <font color="blue">public void</font> writeInt32(<font color="blue">int</font> input)
+              {
+                  writeByte( (<font color="blue">byte</font>)(input >> 24) );
+                  writeByte( (<font color="blue">byte</font>)((input >> 16) % 256) );
+                  writeByte( (<font color="blue">byte</font>)((input >> 8) % 256) );
+                  writeByte( (<font color="blue">byte</font>)(input % 256) );
+              }
+              <font color="blue">public void</font> writeString(<font color="blue">string</font> input)
+              {
+                  <font color="blue">char</font>[] array = input.ToCharArray();
+
+                  writeInt16( (<font color="blue">short</font>)input.Length );
+                  <font color="blue">for</font>(<font color="blue">int</font> i = 0; i < input.Length; i++ )
+                  {
+                      writeByte( (<font color="blue">byte</font>)array[i] );
+                  }
+              }
+              <font color="blue">public void</font> writeChar(<font color="blue">char</font> input)
+              {
+                  writeByte( (<font color="blue">byte</font>)input );
+              }
+              <font color="blue">public void</font> writeChars(<font color="blue">char</font>[] input, <font color="blue">int</font> length)
+              {
+                  <font color="blue">for</font>( <font color="blue">int</font> i = 0; i < length; i++ )
+                  {
+                      <font color="blue">if</font>( i >= input.Length )
+                          writeByte( (<font color="blue">byte</font>)0 );
+                      <font color="blue">else</font>
+                          writeChar( input[i] );
+                  }
+              }
+              <font color="blue">public void</font> writeChars(<font color="blue">char</font>[] input)
+              {
+                  writeChars(input, input.Length);
+              }
+
+              <font color="blue">public byte</font>[] getBytes() { <font color="blue">return</font> m_ByteStream; }
+
+              <font color="blue">public byte</font> readByte()
+              {
+                  <font color="blue">if</font>( position > Size - 1 ) <font color="blue">return</font> 0;
+
+                  position++;
+                  <font color="blue">return</font> m_ByteStream[position - 1];
+              }
+              <font color="blue">public short</font> readInt16()
+              {
+                  <font color="blue">return</font> (<font color="blue">short</font>)((readByte() << 8) + readByte());
+              }
+              <font color="blue">public ushort</font> readUInt16()
+              {
+                  <font color="blue">return</font> (<font color="blue">ushort</font>)((readByte() << 8) + readByte());
+              }
+              <font color="blue">public int</font> readInt32()
+              {
+                  <font color="blue">return</font> (<font color="blue">int</font>)((readByte() << 24) + (readByte() << 16) + (readByte() << 8) + readByte());
+              }
+              <font color="blue">public uint</font> readUInt32()
+              {
+                  <font color="blue">return</font> (<font color="blue">uint</font>)((readByte() << 24) + (readByte() << 16) + (readByte() << 8) + readByte());
+              }
+              <font color="blue">public bool</font> readBoolean()
+              {
+                  <font color="blue">return</font> readByte() == 1 ? <font color="blue">true</font> : <font color="blue">false</font>;
+              }
+              <font color="blue">public char</font> readChar()
+              {
+                  <font color="blue">return</font> (<font color="blue">char</font>)readByte();
+              }
+              <font color="blue">public char</font>[] readChars(<font color="blue">int</font> length)
+              {
+                  <font color="blue">return</font> readChars(length, <font color="blue">false</font>);
+              }
+              <font color="blue">public char</font>[] readChars(<font color="blue">int</font> length, <font color="blue">bool</font> keepnullchars)
+              {
+                  <font color="blue">char</font>[] retVal = <font color="blue">new char</font>[length];
+
+                  <font color="blue">for</font>(<font color="blue">int</font> i = 0; i < length; i++ )
+                  {
+                      retVal[i] = readChar();
+                  }
+
+                  <font color="blue">if</font>( !keepnullchars )
+                  {
+                      <font color="blue">string</font> newVal = "";
+                      <font color="blue">for</font>(<font color="blue">int</font> i = 0; i < length; i++)
+                      {
+                          <font color="blue">if</font>( retVal[i] != (<font color="blue">char</font>)0x00 ) newVal += retVal[i];
+                      }
+                      retVal = newVal.ToCharArray();
+                  }
+
+                  <font color="blue">return</font> retVal;
+              }
+              <font color="blue">public string</font> readString()
+              {
+                  <font color="blue">int</font> length = (<font color="blue">int</font>)readInt16();
+
+                  <font color="blue">string</font> retVal = "";
+                  <font color="blue">for</font>( <font color="blue">int</font> i = 0; i < length; i++ )
+                  {
+                      <font color="blue">char</font> next = readChar();
+                      <font color="blue">if</font>( next != (<font color="blue">char</font>)0x00 )
+                          retVal += next;
+                  }
+
+                  <font color="blue">return</font> retVal;
+              }
+              <font color="blue">public string</font> readString(<font color="blue">int</font> length)
+              {
+                  <font color="blue">string</font> retVal = "";
+                  <font color="blue">for</font>( <font color="blue">int</font> i = 0; i < length; i++ )
+                  {
+                      <font color="blue">char</font> next = readChar();
+                      <font color="blue">if</font>( next != (<font color="blue">char</font>)0x00 ) retVal += next;
+                  }
+
+                  <font color="blue">return</font> retVal;
+              }
+              <font color="blue">public byte</font>[] readBytes(<font color="blue">short</font> length)
+              {
+                  <font color="blue">byte</font>[] retVal = <font color="blue">new byte</font>[length];
+                  <font color="blue">for</font>(<font color="blue">int</font> i = 0; i < length; i++ )
+                  {
+                      retVal[i] = readByte();
+                  }
+
+                  <font color="blue">return</font> retVal;
+              }
+          }
+      }
+    </pre>
+  </body>
+</html>

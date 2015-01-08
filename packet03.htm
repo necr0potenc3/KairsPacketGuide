@@ -1,0 +1,77 @@
+<html>
+  <head>
+    <title>Ultima Online Protocol :: Speech</title>
+  </head>
+  <link href="shared/style.css" type="text/css" rel="stylesheet">
+  <body>
+    <center><strong>Ultima Online Protocol :: Speech</strong></center>
+    <table align="center" border="1" cellpadding="5" cellspacing="0" bordercolor="#000000">
+      <tr>
+        <th width="100">Packet #</th>
+        <th width="150">Packet Name</th>
+        <th width="100">Length</th>
+        <th width="50"><acronym title="Does the client send this message?">Client</acronym></th>
+        <th width="50"><acronym title="Does the server send this message?">Server</acronym></th>
+        <th width="50"><acronym title="If the latest client does not use a packet, the packet is considered to be obsolete.">Obsolete</acronym></th>
+      </tr>
+      <!--0x03 - Speech-->
+      <tr bgcolor="#F0F0F0">
+        <td align="center">0x03</td>
+        <td align="center"><a href="packet03.htm">Speech</a></td>
+        <td align="center"><strong>dynamic</strong></td>
+        <td align="center"><img src="shared/check.gif" border="0"></td>
+        <td align="center"><b>X</b></td>
+        <td align="center"><img src="shared/check.gif" border="0"></td>
+      </tr>
+      <tr>
+        <th>Data Type</th>
+        <th colspan="5">Description</th>
+      </tr>
+      <tr>
+        <td>byte 0x03</td>
+        <td colspan="5">The packet number.</td>
+      </tr>
+      <tr>
+        <td><acronym title="A 16-bit unsigned integer.">ushort</acronym> Size</td>
+        <td colspan="5">The size of the packet.</td>
+      </tr>
+      <tr>
+        <td>byte Mode</td>
+        <td colspan="5">
+          The speech mode.
+          <ul>
+            <li>0x00 - Regular</li>
+            <li>0x01 - Broadcast</li>
+            <li>0x02 - Emote</li>
+            <li>0x06 - System</li>
+            <li>0x07 - Message</li>
+            <li>0x08 - Whisper</li>
+            <li>0x09 - Yell</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><acronym title="A 16-bit unsigned integer.">ushort</acronym> Hue</td>
+        <td colspan="5">The hue of the message.</td>
+      </tr>
+      <tr>
+        <td><acronym title="A 16-bit unsigned integer.">ushort</acronym> Font</td>
+        <td colspan="5">The font number.</td>
+      </tr>
+      <tr>
+        <td><acronym title="An array of characters.">char</acronym>[] Text</td>
+        <td colspan="5">The message to send.</td>
+      </tr>
+      <tr>
+        <td>byte 0x00</td>
+        <td colspan="5">Null terminator for Text.</td>
+      </tr>
+      <tr>
+        <td colspan="6"><br>
+          <b>Packet Description:</b><br>
+          This is sent by older clients instead of the <a href="packetad.htm">Speech Unicode</a> packet.<br><br>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

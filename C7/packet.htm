@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <title>Ultima Online Protocol :: Packet (C++ .NET)</title>
+  </head>
+  <body bgcolor="#FFFFE1" link="#89A5F5" alink="#89A5F5" vlink="#89A5F5">
+    <center><strong>Ultima Online Protocol :: Packet (C++ .NET)</strong></center>
+    <pre>
+      <font color="blue">using</font> System;
+      
+      <font color="blue">namespace</font> UOProtocol
+      {
+          <font color="blue">public class</font> Packet
+          {
+              <font color="blue">public</font> <a href="packetstream.htm">PacketStream</a> Stream = <font color="blue">new</font> PacketStream();
+              <font color="blue">public virtual void</font> Assemble() { }
+              <font color="blue">public virtual void</font> Assemble(<font color="blue">byte</font>[] data) { }
+          }
+      }
+    </pre>
+  </body>
+</html>

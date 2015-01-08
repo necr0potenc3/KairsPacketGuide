@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <title>Ultima Online Protocol :: Packet (VB6)</title>
+  </head>
+  <body bgcolor="#FFFFE1" link="#89A5F5" alink="#89A5F5" vlink="#89A5F5">
+    <center><strong>Ultima Online Protocol :: Packet (VB6)</strong></center>
+    <pre>
+      <font color="blue">Imports</font> System
+
+      <font color="blue">Public Class</font> Packet
+          <font color="blue">Public</font> Stream <font color="blue">As</font> <a href="packetstream.htm">PacketStream</a> = <font color="blue">New</font> PacketStream()
+
+          <font color="blue">Public Overridable Sub</font> Assemble()
+          <font color="blue">End Sub</font>
+
+          <font color="blue">Public Overridable Sub</font> Assemble(<font color="blue">ByVal</font> data() <font color="blue">As Byte</font>)
+          <font color="blue">End Sub</font>
+      <font color="blue">End Class</font>
+    </pre>
+  </body>
+</html>
